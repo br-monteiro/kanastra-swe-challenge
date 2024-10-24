@@ -21,13 +21,12 @@ jobs:
 
       - name: Build image
         run: |
-          echo "Building image"
-          # IMAGE_NAME=kanastra-importer-api make docker/build
+          IMAGE_NAME=kanastra-importer-api CONTEXT=importer-api DOCKERFILE=importer-api/Dockerfile make dock
           # IMAGE_NAME=kanastra-data-process-worker make docker/build
           # IMAGE_NAME=kanastra-send-mail-service make docker/build
 
-      # - name: Run tests for IMPORTER API
-      #   run: IMAGE_NAME=kanastra-importer-api make test
+      - name: Run tests for IMPORTER API
+        run: IMAGE_NAME=kanastra-importer-api CONTEXT=importer-api make test
 
       # - name: Run tests for DATA PROCESS WORKER
       #   run: IMAGE_NAME=kanastra-data-process-worker make test
