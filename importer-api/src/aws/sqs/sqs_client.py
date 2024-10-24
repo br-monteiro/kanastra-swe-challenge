@@ -21,7 +21,12 @@ class SQSClient:
     def send_message(self, queue_url: str, message_body: str):
         self._validate_client()
         self._client.send_message(QueueUrl=queue_url, MessageBody=message_body)
-        self.logger.debug(f"Message sent to queue {queue_url}", extra={"message_body": message_body})
+        self.logger.debug(
+            f"Message sent to queue {queue_url}",
+            extra={
+                "message_body": message_body
+            }
+        )
 
     def _validate_client(self):
         if not self._client:
