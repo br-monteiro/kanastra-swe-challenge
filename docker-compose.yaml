@@ -1,0 +1,31 @@
+version: '3.9'
+services:
+  localstack:
+    container_name: localstack
+    image: localstack/localstack
+    ports:
+      - '4566-4597:4566-4597'
+    environment:
+      - AWS_REGION=us-east-1
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=localstack
+      - AWS_SECRET_ACCESS_KEY=localstack
+    volumes:
+      - ./developer/localstack:/etc/localstack/init/ready.d/
+      - ./data/localstack:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  sqs-admin:
+    image: pacovk/sqs-admin
+    ports:
+      - "3999:3999"
+    environment:
+      - SQS_AWS_REGION=us-east-1
+      - SQS_ENDPOINT_URL=http://localstack:4566
+    depends_on:
+      - localstack

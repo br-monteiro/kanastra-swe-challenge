@@ -1,0 +1,10 @@
+env
+.dockerignore
+Dockerfile
+Dockerfile.prod
+.venv
+.env.dev.example
+.github
+.git
+__pycache__
+data

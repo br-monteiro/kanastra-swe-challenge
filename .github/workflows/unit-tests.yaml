@@ -1,0 +1,36 @@
+name: Unit Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+        - main
+
+jobs:
+  run-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Docker images
+        uses: ScribeMD/docker-cache@0.5.0
+        with:
+          key: docker-${{ runner.os }}-${{ hashFiles('**/requirements.txt') }}
+        continue-on-error: true
+
+      - name: Build image
+        run: |
+          echo "Building image"
+          # IMAGE_NAME=kanastra-importer-api make docker/build
+          # IMAGE_NAME=kanastra-data-process-worker make docker/build
+          # IMAGE_NAME=kanastra-send-mail-service make docker/build
+
+      # - name: Run tests for IMPORTER API
+      #   run: IMAGE_NAME=kanastra-importer-api make test
+
+      # - name: Run tests for DATA PROCESS WORKER
+      #   run: IMAGE_NAME=kanastra-data-process-worker make test
+
+      # - name: Run tests for SEND MAIL SERVICE
+      #   run: IMAGE_NAME=kanastra-send-mail-service make test
