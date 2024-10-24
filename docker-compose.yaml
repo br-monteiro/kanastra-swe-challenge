@@ -29,3 +29,17 @@ services:
       - SQS_ENDPOINT_URL=http://localstack:4566
     depends_on:
       - localstack
+
+  importer-api:
+    build:
+      context: importer-api
+      dockerfile: ./Dockerfile
+    restart: always
+    env_file:
+      - ./importer-api/.env
+    volumes:
+      - ./importer-api:/opt/app
+    ports:
+      - 8000:8000
+    depends_on:
+      - localstack

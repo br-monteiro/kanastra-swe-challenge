@@ -14,7 +14,7 @@ app/logs:
 	docker compose logs -f importer-api process-worker send-mail-service
 
 docker/build:
-	docker build -t $(IMAGE_NAME):latest .
+	docker build -t $(IMAGE_NAME):latest $(CONTEXT) -f $(DOCKERFILE)
 
 test:
-	docker run --rm -v $(PWD):/opt/app $(IMAGE_NAME):latest python -m pytest --cov=.
+	docker run --rm -v "$(PWD)/$(CONTEXT)":/opt/app $(IMAGE_NAME):latest python -m pytest --cov=.
