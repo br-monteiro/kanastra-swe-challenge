@@ -123,16 +123,6 @@ def test_send_message_no_client(get_logger, settings):
 
 
 @patch("src.aws.sqs.sqs_client.get_logger")
-def test_send_message_no_client(get_logger, settings):
-    sqs_client = SQSClient("http://localhost:4566/queue", settings)
-    with pytest.raises(SQSClientException) as exc:
-        sqs_client.send_message("message body")
-
-    assert str(exc.value) == "SQS client not created"
-    get_logger.return_value.error.assert_called_with("SQS client not created")
-
-
-@patch("src.aws.sqs.sqs_client.get_logger")
 def test_validate_client(get_logger, settings):
     sqs_client = SQSClient("http://localhost:4566/queue", settings)
     sqs_client._client = MagicMock()
