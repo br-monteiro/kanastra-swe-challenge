@@ -66,5 +66,5 @@ class MetricsRegistryManager:
         return label_keys.union(labels)
 
 
-def get_metrics():
+def get_metrics_registry():
     return MetricsRegistryManager()
