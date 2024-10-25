@@ -1,5 +1,5 @@
 from fastapi import UploadFile, BackgroundTasks, APIRouter
-from src.api.importer_file.tasks import process_file_task
+from src.api.file_importer.tasks import process_file_task
 
 
 router = APIRouter()
