@@ -38,7 +38,7 @@ services:
     env_file:
       - ./importer-api/.env
     volumes:
-      - ./importer-api:/opt/app
+      - ./importer-api/src:/opt/app/src
     ports:
       - 8000:8000
     depends_on:
