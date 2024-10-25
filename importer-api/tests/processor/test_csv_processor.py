@@ -79,3 +79,27 @@ async def test_process_semaphore_limited_concurrency(mock_metrics, settings, sqs
     await csv_processor.process()
 
     sqs_client.send_message_batch.assert_called_once()
+
+
+@patch("src.processor.csv_processor.METRICS")
+@pytest.mark.asyncio
+async def test_send_batch_messages(mock_metrics, csv_processor, sqs_client):
+    messages = ["message1", "message2", "message3"]
+    semaphore = MagicMock()
+
+    await csv_processor._send_batch_messages(semaphore, messages)
+
+    sqs_client.send_message_batch.assert_called_once_with(messages)
+    mock_metrics.get("csv_processor_messages_sent").inc.assert_called_with(3)
+
+
+@patch("src.processor.csv_processor.METRICS")
+@pytest.mark.asyncio
+async def test_send_batch_messages_handles_exception(mock_metrics, csv_processor, sqs_client):
+    messages = ["message1", "message2", "message3"]
+    semaphore = MagicMock()
+    sqs_client.send_message_batch.side_effect = Exception("SQS error")
+
+    await csv_processor._send_batch_messages(semaphore, messages)
+
+    mock_metrics.get("csv_processor_messages_failed").inc.assert_called_with(3)
