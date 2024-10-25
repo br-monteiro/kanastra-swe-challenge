@@ -1,7 +1,7 @@
 import pytest
 from prometheus_client import REGISTRY
 from unittest.mock import MagicMock, patch
-from src.metrics.metrics_registry_manager import MetricsRegistryManager, get_metrics
+from src.metrics.metrics_registry_manager import MetricsRegistryManager, get_metrics_registry
 
 
 @pytest.fixture(autouse=True)
@@ -200,7 +200,7 @@ def test_union_labels_keys():
 
 
 @patch("src.metrics.metrics_registry_manager.MetricsRegistryManager")
-def test_get_metrics(MetricsRegistryManager):
-    metrics = get_metrics()
+def test_get_metrics_registry(MetricsRegistryManager):
+    metrics = get_metrics_registry()
     MetricsRegistryManager.assert_called_with()
     assert metrics == MetricsRegistryManager.return_value
