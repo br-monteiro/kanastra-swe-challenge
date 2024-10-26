@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     redis_db: int = int(getenv("REDIS_DB", 0))
     redis_connect_timeout: int = int(getenv("REDIS_CONNECT_TIMEOUT", 5))
     redis_operation_timeout: int = int(getenv("REDIS_OPERATION_TIMEOUT", 5))
+    redis_data_expiration: int = int(getenv("REDIS_DATA_EXPIRATION", 3600))
 
 
 @lru_cache()

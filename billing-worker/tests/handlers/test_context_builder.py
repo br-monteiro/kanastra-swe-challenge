@@ -21,12 +21,12 @@ def test_handle_valid_message(settings, sqs_message):
     context = handler.handle(sqs_message)
 
     assert context.status == DataStatus.VALID
-    assert context.debit_details.name == 'John Doe'
-    assert context.debit_details.government_id == 11111111111
-    assert context.debit_details.email == 'johndoe@kanastra.com.br'
-    assert context.debit_details.debt_amount == 1000000.00
-    assert context.debit_details.debt_due_date == '2022-10-12'
-    assert context.debit_details.debt_id == '1adb6ccf-ff16-467f-bea7-5f05d494280f'
+    assert context.bill_details.name == 'John Doe'
+    assert context.bill_details.government_id == 11111111111
+    assert context.bill_details.email == 'johndoe@kanastra.com.br'
+    assert context.bill_details.debt_amount == 1000000.00
+    assert context.bill_details.debt_due_date == '2022-10-12'
+    assert context.bill_details.debt_id == '1adb6ccf-ff16-467f-bea7-5f05d494280f'
     handler.logger.error.assert_not_called()
 
 
