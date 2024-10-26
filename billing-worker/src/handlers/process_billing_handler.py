@@ -3,6 +3,12 @@ from src.models.data_context import DataContext
 from src.models.sqs_message import SQSMessage
 from src.models.data_status import DataStatus
 from src.cache.cache_client import CacheClient
+from src.metrics.metrics_registry_manager import get_metrics_registry
+
+
+METRICS = get_metrics_registry()
+METRICS.register_counter("billing_processed_successfully",
+                         "Billing processed successfully")
 
 
 class ProcessBillingHandler(AbstractHandler):
@@ -22,7 +28,8 @@ class ProcessBillingHandler(AbstractHandler):
 
         self.process(data_context)
         cache_key = f"processed:{data_context.bill_details.debt_id}"
-        self.cache_client.set(cache_key, 1, self.settings.redis_data_expiration)
+        self.cache_client.set(
+            cache_key, 1, self.settings.redis_data_expiration)
 
         data_context.status = DataStatus.PROCESSED
 
@@ -34,4 +41,5 @@ class ProcessBillingHandler(AbstractHandler):
         """
         self.logger.debug('Processing billing', extra={
                           'debt_id': data_context.bill_details.debt_id})
+        METRICS.get("billing_processed_successfully").inc()
         return True

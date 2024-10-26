@@ -3,6 +3,14 @@ from src.aws.sqs.exceptions.sqs_consumer_exception import SQSConsumerException
 from src.config.settings import Settings
 from src.logger.logger import get_logger
 from src.models.sqs_message import SQSMessage
+from src.metrics.metrics_registry_manager import get_metrics_registry
+
+
+METRICS = get_metrics_registry()
+METRICS.register_counter("sqs_consumer_messages_received",
+                         "Number of messages received by the SQS consumer")
+METRICS.register_counter("sqs_consumer_messages_deleted",
+                         "Number of messages deleted by the SQS consumer")
 
 
 class SQSConsumer:
@@ -26,6 +34,7 @@ class SQSConsumer:
             should_run_forever = run_forever
             messages = self._get_messages()
             for message in messages:
+                METRICS.get("sqs_consumer_messages_received").inc()
                 yield SQSMessage(message)
 
     def delete_message(self, message: SQSMessage):
@@ -36,7 +45,9 @@ class SQSConsumer:
                 QueueUrl=queue_url,
                 ReceiptHandle=message.receipt_handle
             )
-            self.logger.debug("Message deleted", extra={"_message": message.content})
+            self.logger.debug("Message deleted", extra={
+                              "_message": message.content})
+            METRICS.get("sqs_consumer_messages_deleted").inc()
         except Exception as e:
             self.logger.error("Error deleting message", extra={"error": e})
 
