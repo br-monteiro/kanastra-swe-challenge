@@ -22,7 +22,7 @@ jobs:
       - name: Build image
         run: |
           IMAGE_NAME=kanastra-importer-api CONTEXT=importer-api DOCKERFILE=importer-api/Dockerfile make docker/build
-          IMAGE_NAME=kanastra-data-process-worker CONTEXT=billing-worker DOCKERFILE=worker/Dockerfile make docker/build
+          IMAGE_NAME=kanastra-data-process-worker CONTEXT=billing-worker DOCKERFILE=billing-worker/Dockerfile make docker/build
           # IMAGE_NAME=kanastra-send-mail-service make docker/build
 
       - name: Run tests for IMPORTER API
