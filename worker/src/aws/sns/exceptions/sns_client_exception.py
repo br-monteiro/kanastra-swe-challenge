@@ -1,0 +1,2 @@
+class SNSClientException(Exception):
+    pass
