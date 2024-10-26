@@ -86,6 +86,11 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
     links:
       - db
       - redis
+      - localstack
