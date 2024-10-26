@@ -25,3 +25,5 @@ class MessageProcessor:
             except Exception as e:
                 self.logger.error(f"Error processing message: {e}")
                 METRICS.get("messages_processed_errors").inc()
+
+            self.sqs_consumer.delete_message(message)

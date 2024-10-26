@@ -28,15 +28,15 @@ class SQSConsumer:
             for message in messages:
                 yield SQSMessage(message)
 
-    def delete_message(self, message):
+    def delete_message(self, message: SQSMessage):
         self._validate_client()
         queue_url = self.settings.sqs_queue_url
         try:
             self._client.delete_message(
                 QueueUrl=queue_url,
-                ReceiptHandle=message["ReceiptHandle"]
+                ReceiptHandle=message.receipt_handle
             )
-            self.logger.debug("Message deleted", extra={"_message": message})
+            self.logger.debug("Message deleted", extra={"_message": message.content})
         except Exception as e:
             self.logger.error("Error deleting message", extra={"error": e})
 
