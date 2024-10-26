@@ -1,7 +1,7 @@
 from src.handlers.abstract_handler import AbstractHandler
 from src.models.data_context import DataContext
 from src.models.sqs_message import SQSMessage
-from src.models.debit_details import DebitDetails
+from src.models.bill_details import BillDetails
 from src.models.data_status import DataStatus
 
 
@@ -23,15 +23,15 @@ class ContextBuilderHandler(AbstractHandler):
             return super().handle(sqs_message,  context)
 
         try:
-            debit_details = DebitDetails()
-            debit_details.name = splited_body[0]
-            debit_details.government_id = int(splited_body[1])
-            debit_details.email = splited_body[2]
-            debit_details.debt_amount = float(splited_body[3])
-            debit_details.debt_due_date = splited_body[4]
-            debit_details.debt_id = splited_body[5]
+            bill_details = BillDetails()
+            bill_details.name = splited_body[0]
+            bill_details.government_id = int(splited_body[1])
+            bill_details.email = splited_body[2]
+            bill_details.debt_amount = float(splited_body[3])
+            bill_details.debt_due_date = splited_body[4]
+            bill_details.debt_id = splited_body[5]
 
-            context.debit_details = debit_details
+            context.bill_details = bill_details
             context.status = DataStatus.VALID
         except Exception as e:
             self.logger.error('Invalid SQS message content', extra={'sqs_message': sqs_message.content})

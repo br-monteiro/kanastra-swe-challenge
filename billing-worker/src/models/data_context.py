@@ -1,8 +1,8 @@
 from src.models.data_status import DataStatus
-from src.models.debit_details import DebitDetails
+from src.models.bill_details import BillDetails
 
 
 class DataContext():
-    def __init__(self, debit_details: DebitDetails = None, status: DataStatus = DataStatus.UNPROCESSED):
-        self.debit_details = debit_details
+    def __init__(self, bill_details: BillDetails = None, status: DataStatus = DataStatus.UNPROCESSED):
+        self.bill_details = bill_details
         self.status = status
