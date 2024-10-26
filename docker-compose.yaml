@@ -65,7 +65,7 @@ services:
 
   redis:
     container_name: redis
-    image: redis:6.2-alpine
+    image: redis:latest
     restart: always
     ports:
       - 6379:6379
@@ -78,7 +78,7 @@ services:
       context: worker
       dockerfile: ./Dockerfile
     ports:
-      - 8000:8000
+      - 8001:8001
     volumes:
       - ./worker/src:/opt/app/src
     env_file:
@@ -86,6 +86,11 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
     links:
       - db
       - redis
+      - localstack

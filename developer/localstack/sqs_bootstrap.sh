@@ -18,7 +18,7 @@ data_process_topic_arn=$(awslocal sns list-topics | jq -r '.Topics[] | select(.T
 
 
 echo "Config queue data-process"
-awslocal sqs set-queue-attributes --queue-url $data_process_queue_url --attributes RedrivePolicy='{"deadLetterTargetArn":"'$data_process_dlq_arn'","maxReceiveCount":"5"}'
+awslocal sqs set-queue-attributes --queue-url $data_process_queue_url --attributes '{"RedrivePolicy": "{\"deadLetterTargetArn\":\"$data_process_dlq_arn\",\"maxReceiveCount\":\"5\"}"}'
 
 
 echo "Subscribe process-email to data-process-topic"
