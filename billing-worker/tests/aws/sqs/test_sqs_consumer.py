@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 from src.aws.sqs.exceptions.sqs_consumer_exception import SQSConsumerException
 from src.aws.sqs.sqs_consumer import SQSConsumer
 from src.config.settings import Settings
+from src.models.sqs_message import SQSMessage
 
 
 @pytest.fixture
@@ -59,7 +60,7 @@ def test_delete_message(get_logger, settings):
     consumer._validate_client = MagicMock()
     consumer._client = MagicMock()
     consumer._client.delete_message = MagicMock()
-    message = {"ReceiptHandle": "receipt_handle"}
+    message = SQSMessage({"ReceiptHandle": "receipt_handle"})
 
     consumer.delete_message(message)
 
@@ -67,7 +68,7 @@ def test_delete_message(get_logger, settings):
     consumer._client.delete_message.assert_called_once_with(QueueUrl="sqs_queue_url",
                                                             ReceiptHandle="receipt_handle")
     get_logger.return_value.debug.assert_called_once_with(
-        "Message deleted", extra={"_message": message})
+        "Message deleted", extra={"_message": message.content})
 
 
 @patch("src.aws.sqs.sqs_consumer.get_logger")
@@ -77,7 +78,7 @@ def test_delete_message_error(get_logger, settings):
     consumer._client = MagicMock()
     exception = Exception("error")
     consumer._client.delete_message = MagicMock(side_effect=exception)
-    message = {"ReceiptHandle": "receipt_handle"}
+    message = SQSMessage({"ReceiptHandle": "receipt_handle"})
 
     consumer.delete_message(message)
 
