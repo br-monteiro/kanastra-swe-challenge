@@ -2,6 +2,7 @@ import boto3
 from src.aws.sqs.exceptions.sqs_consumer_exception import SQSConsumerException
 from src.config.settings import Settings
 from src.logger.logger import get_logger
+from src.models.sqs_message import SQSMessage
 
 
 class SQSConsumer:
@@ -25,7 +26,7 @@ class SQSConsumer:
             should_run_forever = run_forever
             messages = self._get_messages()
             for message in messages:
-                yield message
+                yield SQSMessage(message)
 
     def delete_message(self, message):
         self._validate_client()

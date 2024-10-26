@@ -40,13 +40,13 @@ def test_consume(settings):
     consumer._get_messages = MagicMock(return_value=[
         {"Body": 'test_message_1'},
         {"Body": 'test_message_2'},
-        "invalid"
+        {"invalid": 'test_message_3'}
     ])
     messages = list(consumer.consume(run_forever=False))
 
-    assert messages[0] == {"Body": 'test_message_1'}
-    assert messages[1] == {"Body": 'test_message_2'}
-    assert messages[2] == "invalid"
+    assert messages[0].content == {"Body": 'test_message_1'}
+    assert messages[1].content == {"Body": 'test_message_2'}
+    assert messages[2].content == {"invalid": 'test_message_3'}
 
     assert len(messages) == 3
     consumer._validate_client.assert_called_once()
