@@ -1,6 +1,5 @@
 boto3==1.35.48
 prometheus_client==0.21.0
-psycopg2-binary==2.9.9
 pydantic-settings==2.6.0
 pydantic==2.9.2
 pytest-cov==5.0.0
