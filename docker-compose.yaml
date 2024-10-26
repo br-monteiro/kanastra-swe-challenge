@@ -66,3 +66,32 @@ services:
     depends_on:
       localstack:
         condition: service_healthy
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./developer/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./data/prometheus:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    depends_on:
+      - billing-worker
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/exported_dashboard.json
+    volumes:
+      - ./developer/grafana/provisioning:/etc/grafana/provisioning
+      - ./developer/grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
