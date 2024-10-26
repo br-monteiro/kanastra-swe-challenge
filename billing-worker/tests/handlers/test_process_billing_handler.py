@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock
-from src.handlers.process_billing_handle import ProcessBillingHandler
+from src.handlers.process_billing_handler import ProcessBillingHandler
 from src.models.data_status import DataStatus
 
 

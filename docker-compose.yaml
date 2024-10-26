@@ -14,11 +14,6 @@ services:
       - ./developer/localstack:/etc/localstack/init/ready.d/
       - ./data/localstack:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.sock
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4566/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
 
   sqs-admin:
     container_name: sqs-admin
@@ -29,7 +24,8 @@ services:
       - SQS_AWS_REGION=us-east-1
       - SQS_ENDPOINT_URL=http://localstack:4566
     depends_on:
-      - localstack
+      localstack:
+        condition: service_healthy
 
   importer-api:
     container_name: importer-api
@@ -44,24 +40,8 @@ services:
     ports:
       - 8000:8000
     depends_on:
-      - localstack
-
-  db:
-    container_name: db
-    image: postgres:16.1-alpine
-    restart: always
-    volumes:
-      - ./data/db:/var/lib/postgresql/data
-      - ./developer/postgres:/docker-entrypoint-initdb.d/
-    ports:
-      - 5432:5432
-    env_file:
-      - ./worker/.env
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U userinterest"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      localstack:
+        condition: service_healthy
 
   redis:
     container_name: redis
@@ -84,13 +64,5 @@ services:
     env_file:
       - ./billing-worker/.env
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
       localstack:
         condition: service_healthy
-    links:
-      - db
-      - redis
-      - localstack
