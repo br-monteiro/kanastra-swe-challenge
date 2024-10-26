@@ -78,7 +78,7 @@ services:
       context: worker
       dockerfile: ./Dockerfile
     ports:
-      - 8000:8000
+      - 8001:8001
     volumes:
       - ./worker/src:/opt/app/src
     env_file:
