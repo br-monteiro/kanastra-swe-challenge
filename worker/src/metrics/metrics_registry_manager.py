@@ -10,7 +10,7 @@ class MetricsRegistryManager:
             cls._instance.registry = REGISTRY
             cls._instance.metrics_pool = {}
             cls._instance.default_labels = {
-                "app": "importer-api"
+                "app": "billing-worker"
             }
         return cls._instance
 

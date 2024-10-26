@@ -14,7 +14,7 @@ def test_init():
     assert metrics.registry == REGISTRY
     assert metrics.metrics_pool == {}
     assert metrics.default_labels == {
-        "app": "importer-api"
+        "app": "billing-worker"
     }
 
 
@@ -31,7 +31,7 @@ def test_get():
     }
     metrics.get("metric_name", {"key": "value"})
     metrics.metrics_pool["metric_name"].labels.assert_called_with(
-        app="importer-api",
+        app="billing-worker",
         key="value"
     )
 
@@ -184,7 +184,7 @@ def test_union_labels_values():
     labels = metrics._union_labels_values({"key": "value"})
 
     assert labels == {
-        "app": "importer-api",
+        "app": "billing-worker",
         "key": "value"
     }
 
