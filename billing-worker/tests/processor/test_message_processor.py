@@ -33,6 +33,8 @@ def test_process(get_logger, metrics, handler, sqs_consumer):
     message_processor.process()
 
     sqs_consumer.consume.assert_called_once()
+    sqs_consumer.delete_message.assert_any_call(message1)
+    sqs_consumer.delete_message.assert_any_call(message2)
     handler.handle.assert_any_call(message1)
     handler.handle.assert_any_call(message2)
     get_logger.return_value.debug.assert_any_call(
@@ -56,6 +58,8 @@ def test_process_error(get_logger, metrics, handler, sqs_consumer):
     message_processor.process()
 
     sqs_consumer.consume.assert_called_once()
+    sqs_consumer.delete_message.assert_any_call(message1)
+    sqs_consumer.delete_message.assert_any_call(message2)
     handler.handle.assert_any_call(message1)
     handler.handle.assert_any_call(message2)
     get_logger.return_value.debug.assert_any_call(
