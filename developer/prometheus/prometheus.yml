@@ -1,0 +1,17 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: [localhost:9090]
+
+  - job_name: importer-api
+    static_configs:
+      - targets: [importer-api:8000]
+
+  - job_name: billing-worker
+    static_configs:
+      - targets: [billing-worker:8001]
