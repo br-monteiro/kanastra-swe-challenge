@@ -6,4 +6,3 @@ class DataContext():
     def __init__(self, debit_details: DebitDetails = None, status: DataStatus = DataStatus.UNPROCESSED):
         self.debit_details = debit_details
         self.status = status
-
