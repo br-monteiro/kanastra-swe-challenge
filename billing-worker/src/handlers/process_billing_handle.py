@@ -22,7 +22,7 @@ class ProcessBillingHandler(AbstractHandler):
 
         self.process(data_context)
         cache_key = f"processed:{data_context.bill_details.debt_id}"
-        self.cache_client.set(cache_key, '1', self.settings.redis_data_expiration)
+        self.cache_client.set(cache_key, 1, self.settings.redis_data_expiration)
 
         data_context.status = DataStatus.PROCESSED
 

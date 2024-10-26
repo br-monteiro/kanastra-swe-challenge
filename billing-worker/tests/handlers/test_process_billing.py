@@ -36,7 +36,7 @@ def test_handle(settings, cache_client, sqs_message, data_context):
     handler.logger.debug.assert_any_call(
         'Process billing', extra={'sqs_message': 'message_test'})
     cache_client.set.assert_called_once_with(
-        'processed:kanastra-123', '1', 60)
+        'processed:kanastra-123', 1, 60)
     assert context.status == DataStatus.PROCESSED
 
 
