@@ -72,17 +72,17 @@ services:
     volumes:
       - ./data/redis:/data
 
-  worker:
-    container_name: worker
+  billing-worker:
+    container_name: billing-worker
     build:
-      context: worker
+      context: billing-worker
       dockerfile: ./Dockerfile
     ports:
       - 8001:8001
     volumes:
-      - ./worker/src:/opt/app/src
+      - ./billing-worker/src:/opt/app/src
     env_file:
-      - ./worker/.env
+      - ./billing-worker/.env
     depends_on:
       db:
         condition: service_healthy
