@@ -6,3 +6,4 @@ class DataStatus(Enum):
     VALID = 1
     INVALID = 2
     SKIPPED = 3
+    PROCESSED = 4
