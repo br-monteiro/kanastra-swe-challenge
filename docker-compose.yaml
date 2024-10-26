@@ -21,6 +21,7 @@ services:
       retries: 5
 
   sqs-admin:
+    container_name: sqs-admin
     image: pacovk/sqs-admin
     ports:
       - "3999:3999"
@@ -31,6 +32,7 @@ services:
       - localstack
 
   importer-api:
+    container_name: importer-api
     build:
       context: importer-api
       dockerfile: ./Dockerfile
@@ -43,3 +45,45 @@ services:
       - 8000:8000
     depends_on:
       - localstack
+
+  db:
+    container_name: db
+    image: postgres:16.1-alpine
+    restart: always
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+      - ./developer/postgres:/docker-entrypoint-initdb.d/
+    ports:
+      - 5432:5432
+    env_file:
+      - ./worker/.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U userinterest"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    container_name: redis
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - ./data/redis:/data
+
+  worker:
+    container_name: worker
+    build:
+      context: worker
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./worker/src:/opt/app/src
+    env_file:
+      - ./worker/.env
+    depends_on:
+      db:
+        condition: service_healthy
+    links:
+      - db
+      - redis
