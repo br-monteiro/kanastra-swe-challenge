@@ -20,21 +20,18 @@ class ProcessBillingHandler(AbstractHandler):
         if data_context.status == DataStatus.SKIPPED:
             return super().handle(sqs_message,  data_context)
 
-        process_result = self.process(data_context)
-        cache_key = data_context.bill_details.debt_id
-        self.cache_client.set(cache_key, process_result)
+        self.process(data_context)
+        cache_key = f"processed:{data_context.bill_details.debt_id}"
+        self.cache_client.set(cache_key, '1', self.settings.redis_data_expiration)
 
         data_context.status = DataStatus.PROCESSED
 
         return super().handle(sqs_message,  data_context)
 
-    def process(self, data_context: DataContext) -> str:
+    def process(self, data_context: DataContext) -> bool:
         """
         Do some magic here like processing the billing and others stuff
         """
         self.logger.debug('Processing billing', extra={
                           'debt_id': data_context.bill_details.debt_id})
-
-        data_context.bill_details.has_been_processed = True
-
-        return data_context.bill_details.to_json()
+        return True

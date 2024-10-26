@@ -19,13 +19,8 @@ class CheckBillingHandler(AbstractHandler):
                               'sqs_message': sqs_message.content})
             return super().handle(sqs_message,  data_context)
 
-        if data_context.bill_details.has_been_processed:
-            self.logger.debug('Bill already processed', extra={
-                              'sqs_message': sqs_message.content})
-            data_context.status = DataStatus.SKIPPED
-            return super().handle(sqs_message,  data_context)
-
-        if self.cache_client.get(data_context.bill_details.debt_id):
+        cache_key = f"processed:{data_context.bill_details.debt_id}"
+        if self.cache_client.get(cache_key):
             self.logger.debug('Bill already processed', extra={
                               'sqs_message': sqs_message.content})
             data_context.status = DataStatus.SKIPPED
