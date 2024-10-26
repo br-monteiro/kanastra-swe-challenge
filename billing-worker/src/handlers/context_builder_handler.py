@@ -43,5 +43,6 @@ class ContextBuilderHandler(AbstractHandler):
         except Exception as e:
             self.logger.error('Invalid SQS message content', extra={'sqs_message': sqs_message.content})
             context.status = DataStatus.INVALID
+            METRICS.get("invalid_messages").inc()
 
         return super().handle(sqs_message,  context)
