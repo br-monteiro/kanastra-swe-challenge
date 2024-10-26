@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     sqs_endpoint_url: str = getenv("SQS_ENDPOINT_URL", "")
     sqs_max_messages: int = int(getenv("SQS_MAX_MESSAGES", 10))
     sqs_wait_time_seconds: int = int(getenv("SQS_WAIT_TIME_SECONDS", 20))
+    sns_endpoint_url: str = getenv("SNS_ENDPOINT_URL", "")
+    sns_topic_arn: str = getenv("SNS_TOPIC_ARN", "")
 
 
 @lru_cache()
