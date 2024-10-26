@@ -1,10 +1,10 @@
 import boto3
-from src.aws.sqs.exceptions.sqs_consumer_exception import SqsConsumerException
+from src.aws.sqs.exceptions.sqs_consumer_exception import SQSConsumerException
 from src.config.settings import Settings
 from src.logger.logger import get_logger
 
 
-class SqsConsumer:
+class SQSConsumer:
     def __init__(self, settings: Settings):
         self.settings = settings
         self._client = None
@@ -52,4 +52,4 @@ class SqsConsumer:
         if not self._client:
             message = "SQS client not created"
             self.logger.error(message)
-            raise SqsConsumerException(message)
+            raise SQSConsumerException(message)
