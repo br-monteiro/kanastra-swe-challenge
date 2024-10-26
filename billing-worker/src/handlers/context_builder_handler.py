@@ -3,6 +3,11 @@ from src.models.data_context import DataContext
 from src.models.sqs_message import SQSMessage
 from src.models.bill_details import BillDetails
 from src.models.data_status import DataStatus
+from src.metrics.metrics_registry_manager import get_metrics_registry
+
+
+METRICS = get_metrics_registry()
+METRICS.register_counter("invalid_messages", "Invalid messages")
 
 
 class ContextBuilderHandler(AbstractHandler):
@@ -13,6 +18,7 @@ class ContextBuilderHandler(AbstractHandler):
         if not sqs_message.receipt_handle or not sqs_message.body:
             self.logger.error('Invalid SQS message', extra={'sqs_message': sqs_message.content})
             context.status = DataStatus.INVALID
+            METRICS.get("invalid_messages").inc()
             return super().handle(sqs_message,  context)
 
         splited_body = sqs_message.body.split(',')
@@ -20,6 +26,7 @@ class ContextBuilderHandler(AbstractHandler):
         if len(splited_body) != 6:
             self.logger.error('Invalid SQS message content', extra={'sqs_message': sqs_message.content})
             context.status = DataStatus.INVALID
+            METRICS.get("invalid_messages").inc()
             return super().handle(sqs_message,  context)
 
         try:

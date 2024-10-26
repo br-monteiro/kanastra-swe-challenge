@@ -3,6 +3,11 @@ from src.models.data_context import DataContext
 from src.models.sqs_message import SQSMessage
 from src.models.data_status import DataStatus
 from src.cache.cache_client import CacheClient
+from src.metrics.metrics_registry_manager import get_metrics_registry
+
+
+METRICS = get_metrics_registry()
+METRICS.register_counter("skipped_messages", "Skipped messages")
 
 
 class CheckBillingHandler(AbstractHandler):
@@ -23,6 +28,7 @@ class CheckBillingHandler(AbstractHandler):
         if self.cache_client.get(cache_key):
             self.logger.debug('Bill already processed', extra={
                               'sqs_message': sqs_message.content})
+            METRICS.get("skipped_messages").inc()
             data_context.status = DataStatus.SKIPPED
 
         return super().handle(sqs_message,  data_context)

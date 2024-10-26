@@ -5,6 +5,11 @@ from src.models.sqs_message import SQSMessage
 from src.models.data_status import DataStatus
 from src.cache.cache_client import CacheClient
 from src.aws.sns.sns_client import SNSClient
+from src.metrics.metrics_registry_manager import get_metrics_registry
+
+
+METRICS = get_metrics_registry()
+METRICS.register_counter("notification_sent", "Notification sent")
 
 
 class NotificationHandler(AbstractHandler):
@@ -38,3 +43,4 @@ class NotificationHandler(AbstractHandler):
 
         json_data = dumps(data_context.bill_details.__dict__)
         self.sns_client.publish(json_data)
+        METRICS.get("notification_sent").inc()
