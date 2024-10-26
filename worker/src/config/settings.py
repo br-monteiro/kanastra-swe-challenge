@@ -12,6 +12,13 @@ class Settings(BaseSettings):
     sqs_wait_time_seconds: int = int(getenv("SQS_WAIT_TIME_SECONDS", 20))
     sns_endpoint_url: str = getenv("SNS_ENDPOINT_URL", "")
     sns_topic_arn: str = getenv("SNS_TOPIC_ARN", "")
+    redis_connection_max_retries: int = int(getenv("REDIS_CONNECTION_MAX_RETRIES", 3))
+    redis_connection_retry_interval: int = int(getenv("REDIS_CONNECTION_RETRY_INTERVAL", 5))
+    redis_host: str = getenv("REDIS_HOST", "")
+    redis_port: int = int(getenv("REDIS_PORT", 6379))
+    redis_db: int = int(getenv("REDIS_DB", 0))
+    redis_connect_timeout: int = int(getenv("REDIS_CONNECT_TIMEOUT", 5))
+    redis_operation_timeout: int = int(getenv("REDIS_OPERATION_TIMEOUT", 5))
 
 
 @lru_cache()
