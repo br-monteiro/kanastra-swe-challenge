@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock, patch
-from src.aws.sqs.exceptions.sqs_consumer_exception import SqsConsumerException
-from src.aws.sqs.sqs_consumer import SqsConsumer
+from src.aws.sqs.exceptions.sqs_consumer_exception import SQSConsumerException
+from src.aws.sqs.sqs_consumer import SQSConsumer
 from src.config.settings import Settings
 
 
@@ -16,7 +16,7 @@ def settings():
 
 @patch("src.aws.sqs.sqs_consumer.get_logger")
 def test_init(get_logger, settings):
-    consumer = SqsConsumer(settings)
+    consumer = SQSConsumer(settings)
     assert consumer.settings == settings
     assert consumer._client is None
     assert consumer.logger == get_logger.return_value
@@ -26,7 +26,7 @@ def test_init(get_logger, settings):
 @patch("src.aws.sqs.sqs_consumer.get_logger")
 @patch("src.aws.sqs.sqs_consumer.boto3")
 def test_create_client(boto3, get_logger, settings):
-    consumer = SqsConsumer(settings)
+    consumer = SQSConsumer(settings)
     consumer.create_client()
     assert consumer._client == boto3.client.return_value
     boto3.client.assert_called_once_with(
@@ -35,18 +35,18 @@ def test_create_client(boto3, get_logger, settings):
 
 
 def test_consume(settings):
-    consumer = SqsConsumer(settings)
+    consumer = SQSConsumer(settings)
     consumer._validate_client = MagicMock()
     consumer._get_messages = MagicMock(return_value=[
         {"Body": 'test_message_1'},
         {"Body": 'test_message_2'},
-        "invalid"
+        {"invalid": 'test_message_3'}
     ])
     messages = list(consumer.consume(run_forever=False))
 
-    assert messages[0] == {"Body": 'test_message_1'}
-    assert messages[1] == {"Body": 'test_message_2'}
-    assert messages[2] == "invalid"
+    assert messages[0].content == {"Body": 'test_message_1'}
+    assert messages[1].content == {"Body": 'test_message_2'}
+    assert messages[2].content == {"invalid": 'test_message_3'}
 
     assert len(messages) == 3
     consumer._validate_client.assert_called_once()
@@ -55,7 +55,7 @@ def test_consume(settings):
 
 @patch("src.aws.sqs.sqs_consumer.get_logger")
 def test_delete_message(get_logger, settings):
-    consumer = SqsConsumer(settings)
+    consumer = SQSConsumer(settings)
     consumer._validate_client = MagicMock()
     consumer._client = MagicMock()
     consumer._client.delete_message = MagicMock()
@@ -72,7 +72,7 @@ def test_delete_message(get_logger, settings):
 
 @patch("src.aws.sqs.sqs_consumer.get_logger")
 def test_delete_message_error(get_logger, settings):
-    consumer = SqsConsumer(settings)
+    consumer = SQSConsumer(settings)
     consumer._validate_client = MagicMock()
     consumer._client = MagicMock()
     exception = Exception("error")
@@ -89,7 +89,7 @@ def test_delete_message_error(get_logger, settings):
 
 
 def test_get_messages(settings):
-    consumer = SqsConsumer(settings)
+    consumer = SQSConsumer(settings)
     consumer._client = MagicMock()
     consumer._client.receive_message = MagicMock(
         return_value={"Messages": [1, 2, 3]})
@@ -100,7 +100,7 @@ def test_get_messages(settings):
 
 
 def test_get_messages_no_messages(settings):
-    consumer = SqsConsumer(settings)
+    consumer = SQSConsumer(settings)
     consumer._client = MagicMock()
     consumer._client.receive_message = MagicMock(return_value={})
     assert consumer._get_messages() == []
@@ -110,14 +110,14 @@ def test_get_messages_no_messages(settings):
 
 
 def test_validate_client_has_client(settings):
-    consumer = SqsConsumer(settings)
+    consumer = SQSConsumer(settings)
     consumer._client = MagicMock()
     consumer._validate_client()
 
 
 def test_validate_client_no_client(settings):
-    consumer = SqsConsumer(settings)
+    consumer = SQSConsumer(settings)
     consumer._client = None
-    with pytest.raises(SqsConsumerException) as exc:
+    with pytest.raises(SQSConsumerException) as exc:
         consumer._validate_client()
     assert str(exc.value) == "SQS client not created"

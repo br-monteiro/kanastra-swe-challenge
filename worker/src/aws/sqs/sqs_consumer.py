@@ -1,10 +1,11 @@
 import boto3
-from src.aws.sqs.exceptions.sqs_consumer_exception import SqsConsumerException
+from src.aws.sqs.exceptions.sqs_consumer_exception import SQSConsumerException
 from src.config.settings import Settings
 from src.logger.logger import get_logger
+from src.models.sqs_message import SQSMessage
 
 
-class SqsConsumer:
+class SQSConsumer:
     def __init__(self, settings: Settings):
         self.settings = settings
         self._client = None
@@ -25,7 +26,7 @@ class SqsConsumer:
             should_run_forever = run_forever
             messages = self._get_messages()
             for message in messages:
-                yield message
+                yield SQSMessage(message)
 
     def delete_message(self, message):
         self._validate_client()
@@ -52,4 +53,4 @@ class SqsConsumer:
         if not self._client:
             message = "SQS client not created"
             self.logger.error(message)
-            raise SqsConsumerException(message)
+            raise SQSConsumerException(message)
