@@ -30,6 +30,7 @@ class ProcessBillingHandler(AbstractHandler):
         cache_key = f"processed:{data_context.bill_details.debt_id}"
         self.cache_client.set(
             cache_key, 1, self.settings.redis_data_expiration)
+        METRICS.get("billing_processed_successfully").inc()
 
         data_context.status = DataStatus.PROCESSED
 
