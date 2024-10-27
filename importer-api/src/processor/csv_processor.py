@@ -20,6 +20,7 @@ class CSVProcessor:
     async def process(self):
         self.logger.debug("Initiating CSV processing")
         messages = []
+        tasks = []
         semaphore = asyncio.Semaphore(
             self.settings.max_csv_process_concurrent_tasks
         )
@@ -31,12 +32,19 @@ class CSVProcessor:
             messages.append(normalized_line)
 
             if self._is_message_buffer_full(messages):
-                await self._send_batch_messages(semaphore, messages)
+                if len(tasks) >= self.settings.max_csv_process_concurrent_tasks:
+                    await asyncio.gather(*tasks)
+                    tasks = []
+                task = asyncio.create_task(self._send_batch_messages(semaphore, messages))
+                tasks.append(task)
                 messages = []
 
 
         if messages:
-            await self._send_batch_messages(semaphore, messages)
+            task = asyncio.create_task(self._send_batch_messages(semaphore, messages))
+            tasks.append(task)
+
+        await asyncio.gather(*tasks)
 
     def _is_message_buffer_full(self, messages: list):
         return len(messages) >= self.settings.max_sqs_send_message_batch_size
@@ -44,7 +52,7 @@ class CSVProcessor:
     async def _send_batch_messages(self, semaphore: asyncio.Semaphore, messages: list):
         async with semaphore:
             try:
-                self.sqs_client.send_message_batch(messages)
+                self.sqs_client.send_message_batch(messages.copy())
                 METRICS.get("csv_processor_messages_sent").inc(len(messages))
             except Exception as e:
                 self.logger.error(f"Error sending messages: {e}")
