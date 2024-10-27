@@ -92,6 +92,26 @@ As regras de negócio para a geração de boletos estão contidas nos seguintes 
 - `ProcessBillingHandler`: responsável por processar a cobrança, gerar o boleto de cobrança e salvar o processamento no cache (Redis) (PROCESSED).
 - `NotificationScheduleHandler`: responsável por agendar o envio de uma notificação para o cliente (SCHEDULED).
 
+A implementação de Handler se parece com isso:
+
+```python
+from src.handlers.abstract_handler import AbstractHandler
+from src.models.data_context import DataContext
+from src.models.sqs_message import SQSMessage
+from src.models.data_status import DataStatus
+
+
+class MyMagicHandler(AbstractHandler):
+    def handle(self, sqs_message: SQSMessage,  data_context: DataContext = None) -> DataContext:
+        if (data_context.status == DataStatus.INVALID):
+            """
+            Do some magic with the data_context.bill_details
+            """
+            data_context.bill_details.debt_amount = 0
+
+        return super().handle(sqs_message,  data_context)
+```
+
 Por se tratar de um desafio, as regras de negócio implementadas são simples, mas é possível adicionar novas regras de negócio facilmente, criando novos handlers e adicionando-os ao pipeline execução.
 
 Após o processamento da cobrança, as notificações são enviadas para o tópico do AWS SNS, que é consumido pela aplicação `send-mail-worker` (ou outro serviço de notificação). As mensagens são enviadas assincronamente, permitindo que a aplicação continue consumindo as mensagens da fila de mensageria (AWS SQS).
