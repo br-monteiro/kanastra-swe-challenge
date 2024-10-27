@@ -1,0 +1,2 @@
+class SQSConsumerException(Exception):
+    pass
