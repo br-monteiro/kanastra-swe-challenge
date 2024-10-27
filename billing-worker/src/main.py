@@ -5,9 +5,10 @@ from src.cache.redis_client import RedisClient
 from src.config.settings import get_settings
 from src.handlers.check_billing_handler import CheckBillingHandler
 from src.handlers.context_builder_handler import ContextBuilderHandler
-from src.handlers.notification_handler import NotificationHandler
+from src.handlers.notification_schedule_handler import NotificationScheduleHandler
 from src.handlers.process_billing_handler import ProcessBillingHandler
 from src.processors.message_processor import MessageProcessor
+from src.services.notification_service import NotificationService
 
 
 def main():
@@ -23,10 +24,12 @@ def main():
     sqs_consumer = SQSConsumer(settings)
     sqs_consumer.create_client()
 
+    notification_service = NotificationService(settings, sns_client)
+
     context_builder = ContextBuilderHandler(settings)
     check_billing = CheckBillingHandler(settings, redis_client)
     process_billing = ProcessBillingHandler(settings, redis_client)
-    notification = NotificationHandler(settings, redis_client, sns_client)
+    notification = NotificationScheduleHandler(settings, redis_client, notification_service)
 
     context_builder.set_next(check_billing).set_next(
         process_billing).set_next(notification)
