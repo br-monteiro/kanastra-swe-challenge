@@ -11,7 +11,7 @@ app/up/build:
 	docker compose up --build
 
 app/logs:
-	docker compose logs -f importer-api process-worker send-mail-service
+	docker compose logs -f importer-api billing-worker send-mail-worker
 
 app/setup:
 	bash ./developer/setup/setup.sh
