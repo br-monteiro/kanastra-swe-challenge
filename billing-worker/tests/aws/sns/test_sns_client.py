@@ -68,6 +68,57 @@ def test_publish_no_client(get_logger, settings):
 
 
 @patch("src.aws.sns.sns_client.get_logger")
+def test_publish_batch(get_logger, settings):
+    sns_client = SNSClient(
+        "arn:aws:sns:us-east-1:123456789012:topic", settings)
+    sns_client._client = MagicMock()
+    sns_client.publish_batch(["Kanastra", "Kanastra"])
+
+    sns_client._client.publish_batch.assert_called_once_with(
+        TopicArn="arn:aws:sns:us-east-1:123456789012:topic",
+        PublishBatchRequestEntries=[
+            {"Id": "0", "Message": "Kanastra"},
+            {"Id": "1", "Message": "Kanastra"}
+        ]
+    )
+    get_logger.return_value.debug.assert_called_once_with(
+        "Messages published to topic arn:aws:sns:us-east-1:123456789012:topic",
+        extra={"messages": ["Kanastra", "Kanastra"]}
+    )
+
+
+@patch("src.aws.sns.sns_client.get_logger")
+def test_publish_batch_no_client(get_logger, settings):
+    sns_client = SNSClient(
+        "arn:aws:sns:us-east-1:123456789012:topic", settings)
+
+    with pytest.raises(Exception) as exc:
+        sns_client.publish_batch(["Kanastra", "Kanastra"])
+
+    assert str(exc.value) == "SNS client not created"
+    get_logger.return_value.error.assert_called_once_with(
+        "SNS client not created")
+
+
+@patch("src.aws.sns.sns_client.get_logger")
+def test_publish_batch_error(get_logger, settings):
+    sns_client = SNSClient(
+        "arn:aws:sns:us-east-1:123456789012:topic", settings)
+    sns_client._client = MagicMock()
+    sns_client._client.publish_batch.side_effect = Exception("Error")
+
+    sns_client.publish_batch(["Kanastra", "Kanastra"])
+
+    get_logger.return_value.error.assert_called_once_with(
+        "Error publishing messages to topic arn:aws:sns:us-east-1:123456789012:topic",
+        extra={
+            "messages": ["Kanastra", "Kanastra"],
+            "error": "Error"
+        }
+    )
+
+
+@patch("src.aws.sns.sns_client.get_logger")
 def test_validate_client(get_logger, settings):
     sns_client = SNSClient(
         "arn:aws:sns:us-east-1:123456789012:topic", settings)
