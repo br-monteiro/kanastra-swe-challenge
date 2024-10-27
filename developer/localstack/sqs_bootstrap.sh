@@ -3,9 +3,9 @@
 apt install jq -y
 
 echo "Creating SQS queues"
-awslocal sqs create-queue --queue-name data-process
-awslocal sqs create-queue --queue-name data-process-dlq
-awslocal sqs create-queue --queue-name process-email
+awslocal sqs create-queue --queue-name data-process --attributes VisibilityTimeout=30
+awslocal sqs create-queue --queue-name data-process-dlq --attributes VisibilityTimeout=30
+awslocal sqs create-queue --queue-name process-email --attributes VisibilityTimeout=30
 
 
 echo "Creating SNS topic"
