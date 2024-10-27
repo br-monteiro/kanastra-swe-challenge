@@ -13,6 +13,9 @@ app/up/build:
 app/logs:
 	docker compose logs -f importer-api process-worker send-mail-service
 
+app/setup:
+	bash ./developer/setup/setup.sh
+
 docker/build:
 	docker build -t $(IMAGE_NAME):latest $(CONTEXT) -f $(DOCKERFILE)
 
