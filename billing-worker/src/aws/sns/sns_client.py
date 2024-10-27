@@ -2,6 +2,12 @@ import boto3
 from src.config.settings import Settings
 from src.logger.logger import get_logger
 from src.aws.sns.exceptions.sns_client_exception import SNSClientException
+from src.metrics.metrics_registry_manager import get_metrics_registry
+
+
+METRICS = get_metrics_registry()
+METRICS.register_counter("notification_sent", "Notification sent")
+METRICS.register_counter("notification_sent_errors", "Notification sent with errors")
 
 
 class SNSClient:
@@ -27,6 +33,38 @@ class SNSClient:
         )
         self.logger.debug(f"Message published to topic {
                           self.topic_arn}", extra={"content": message})
+        METRICS.get("notification_sent").inc()
+
+    def publish_batch(self, messages: list):
+        self._validate_client()
+
+        messages_len = len(messages)
+
+        entries = [
+            {"Id": str(i), "Message": message} for i, message in enumerate(messages)
+        ]
+
+        try:
+            self._client.publish_batch(
+                TopicArn=self.topic_arn,
+                PublishBatchRequestEntries=entries
+            )
+            self.logger.debug(
+                f"Messages published to topic {self.topic_arn}",
+                extra={
+                    "messages": messages
+                }
+            )
+            METRICS.get("notification_sent").inc(messages_len)
+        except Exception as e:
+            self.logger.error(
+                f"Error publishing messages to topic {self.topic_arn}",
+                extra={
+                    "messages": messages,
+                    "error": str(e)
+                }
+            )
+            METRICS.get("notification_sent_errors").inc(messages_len)
 
     def _validate_client(self):
         if not self._client:
