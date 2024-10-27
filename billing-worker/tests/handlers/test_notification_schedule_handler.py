@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock
-from src.handlers.notification_handler import NotificationHandler
+from src.handlers.notification_schedule_handler import NotificationScheduleHandler
 from src.models.data_status import DataStatus
 from src.models.bill_details import BillDetails
 
@@ -16,7 +16,7 @@ def cache_client():
 
 
 @pytest.fixture
-def sns_client():
+def notification_service():
     return MagicMock()
 
 
@@ -33,13 +33,13 @@ def data_context():
     return MagicMock(bill_details=bill_details)
 
 
-def test_handle(settings, cache_client, sns_client, sqs_message, data_context):
+def test_handle(settings, cache_client, notification_service, sqs_message, data_context):
     cache_client.get.return_value = None
     data_context.status = DataStatus.VALID
 
-    handler = NotificationHandler(settings, cache_client, sns_client)
+    handler = NotificationScheduleHandler(settings, cache_client, notification_service)
     handler.logger = MagicMock()
-    handler.notify = MagicMock()
+    handler.schedule = MagicMock()
     context = handler.handle(sqs_message, data_context)
 
     assert context == data_context
@@ -47,44 +47,45 @@ def test_handle(settings, cache_client, sns_client, sqs_message, data_context):
         'Notification', extra={'sqs_message': 'message_test'})
     cache_client.set.assert_called_once_with(
         'notification:kanastra-123', 1, 60)
-    handler.notify.assert_called_once_with(data_context)
+    handler.schedule.assert_called_once_with(data_context)
 
 
-def test_handle_invalid_context(settings, cache_client, sns_client, sqs_message, data_context):
+def test_handle_invalid_context(settings, cache_client, notification_service, sqs_message, data_context):
     data_context.status = DataStatus.INVALID
 
-    handler = NotificationHandler(settings, cache_client, sns_client)
+    handler = NotificationScheduleHandler(settings, cache_client, notification_service)
     handler.logger = MagicMock()
-    handler.notify = MagicMock()
+    handler.schedule = MagicMock()
     context = handler.handle(sqs_message, data_context)
 
     assert context == data_context
     cache_client.get.assert_not_called()
     cache_client.set.assert_not_called()
-    handler.notify.assert_not_called()
+    handler.schedule.assert_not_called()
 
 
-def test_handle_cached(settings, cache_client, sns_client, sqs_message, data_context):
+def test_handle_cached(settings, cache_client, notification_service, sqs_message, data_context):
     cache_client.get.return_value = 1
     data_context.status = DataStatus.VALID
 
-    handler = NotificationHandler(settings, cache_client, sns_client)
+    handler = NotificationScheduleHandler(settings, cache_client, notification_service)
     handler.logger = MagicMock()
-    handler.notify = MagicMock()
+    handler.schedule = MagicMock()
     context = handler.handle(sqs_message, data_context)
 
     assert context == data_context
     cache_client.get.assert_called_once_with('notification:kanastra-123')
     cache_client.set.assert_not_called()
-    handler.notify.assert_not_called()
+    handler.schedule.assert_not_called()
 
 
-def test_notify(settings, cache_client, sns_client, data_context):
-    handler = NotificationHandler(settings, cache_client, sns_client)
+def test_schedule(settings, cache_client, notification_service, data_context):
+    handler = NotificationScheduleHandler(settings, cache_client, notification_service)
     handler.logger = MagicMock()
-    handler.notify(data_context)
+    handler.schedule(data_context)
 
     handler.logger.debug.assert_called_once_with(
-        'Sending notification', extra={'debt_id': 'kanastra-123'})
-    sns_client.publish.assert_called_once_with(
+        'Schedule notification', extra={'debt_id': 'kanastra-123'})
+    notification_service.enqueue.assert_called_once_with(
         '{"debt_id": "kanastra-123"}')
+    notification_service.enqueue.return_value.flush.assert_called_once()
