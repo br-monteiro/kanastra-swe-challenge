@@ -67,6 +67,21 @@ services:
       localstack:
         condition: service_healthy
 
+  send-mail-worker:
+    container_name: send-mail-worker
+    build:
+      context: send-mail-worker
+      dockerfile: ./Dockerfile
+    ports:
+      - 8002:8002
+    volumes:
+      - ./send-mail-worker/src:/opt/app/src
+    env_file:
+      - ./send-mail-worker/.env
+    depends_on:
+      localstack:
+        condition: service_healthy
+
   prometheus:
     container_name: prometheus
     image: prom/prometheus
@@ -79,6 +94,7 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
     depends_on:
       - billing-worker
+      - send-mail-worker
 
   grafana:
     image: grafana/grafana

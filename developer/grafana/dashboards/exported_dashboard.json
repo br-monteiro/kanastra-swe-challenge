@@ -108,7 +108,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "increase(csv_processor_messages_sent_total[1m])",
+          "expr": "increase(csv_processor_messages_sent_total{app=\"importer-api\"}[1m])",
           "format": "time_series",
           "instant": false,
           "legendFormat": "success",
@@ -121,7 +121,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "increase(csv_processor_messages_failed_total[1m])",
+          "expr": "increase(csv_processor_messages_failed_total{app=\"importer-api\"}[1m])",
           "hide": false,
           "instant": false,
           "legendFormat": "failed",
@@ -265,7 +265,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "increase(sqs_consumer_messages_received_total[1m])",
+          "expr": "increase(sqs_consumer_messages_received_total{app=\"billing-worker\"}[1m])",
           "format": "time_series",
           "instant": false,
           "legendFormat": "msg received",
@@ -278,7 +278,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "increase(sqs_consumer_messages_deleted_total[1m])",
+          "expr": "increase(sqs_consumer_messages_deleted_total{app=\"billing-worker\"}[1m])",
           "hide": false,
           "instant": false,
           "legendFormat": "msg deleted",
@@ -291,7 +291,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "increase(invalid_messages_total[1m])",
+          "expr": "increase(invalid_messages_total{app=\"billing-worker\"}[1m])",
           "hide": false,
           "instant": false,
           "legendFormat": "msg invalid",
@@ -304,7 +304,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "increase(skipped_messages_total[1m])",
+          "expr": "increase(skipped_messages_total{app=\"billing-worker\"}[1m])",
           "hide": false,
           "instant": false,
           "legendFormat": "skipped",
@@ -317,7 +317,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "increase(billing_processed_successfully_total[1m])",
+          "expr": "increase(billing_processed_successfully_total{app=\"billing-worker\"}[1m])",
           "hide": false,
           "instant": false,
           "legendFormat": "billed",
@@ -330,7 +330,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "increase(notification_sent_total[1m])",
+          "expr": "increase(notification_sent_total{app=\"billing-worker\"}[1m])",
           "hide": false,
           "instant": false,
           "legendFormat": "notified",
@@ -340,16 +340,186 @@
       ],
       "title": "Billing Worker",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "notified"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#2fc41b",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "billed"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "msg invalid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 0
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "increase(sqs_consumer_messages_received_total{app=\"send-mail-worker\"}[1m])",
+          "format": "time_series",
+          "instant": false,
+          "legendFormat": "msg received",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "increase(sqs_consumer_messages_deleted_total{app=\"send-mail-worker\"}[1m])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "msg deleted",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "increase(mails_sent_total{app=\"send-mail-worker\"}[1m])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "sent mail",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Send Mail Worker",
+      "type": "timeseries"
     }
   ],
-  "refresh": "",
+  "refresh": "auto",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
